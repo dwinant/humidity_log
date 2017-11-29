@@ -1,0 +1,4 @@
+*.log
+*.logged
+*.ready
+*.tmp
