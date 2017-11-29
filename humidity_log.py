@@ -11,7 +11,7 @@ import smbus
 import socket
 import time
 
-LOG_INTERVAL_MINUTES = 1
+LOG_INTERVAL_MINUTES = 5
 I2C_BUS = 1
 LOG_FILE = '/home/pi/humidity/humidity.log'
 
