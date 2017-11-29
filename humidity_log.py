@@ -16,7 +16,7 @@ I2C_BUS = 1
 LOG_FILE = '/home/pi/humidity/humidity.log'
 
 # Derived Values
-_LOG_INTERVAL_SECONDS = 10 + 0*LOG_INTERVAL_MINUTES * 60
+_LOG_INTERVAL_SECONDS = LOG_INTERVAL_MINUTES * 60
 
 # Get I2C bus
 bus = smbus.SMBus(I2C_BUS)
