@@ -16,7 +16,7 @@ I2C_BUS = 1
 LOG_FILE = '/home/pi/humidity/humidity.log'
 
 # Derived Values
-_LOG_INTERVAL_SECONDS = LOG_INTERVAL_MINUTES * 60
+_LOG_INTERVAL_SECONDS = 10 + 0*LOG_INTERVAL_MINUTES * 60
 
 # Get I2C bus
 bus = smbus.SMBus(I2C_BUS)
@@ -40,8 +40,8 @@ def read_humidity_and_temperature():
     time.sleep(0.1)
 
     # SI7021 address, 0x40(64)
-    #		0xF3(243)	Select temperature NO HOLD master mode
-    bus.write_byte(0x40, 0xF3)
+    #		0xE0(224)	Select temperature (read after humidity)
+    bus.write_byte(0x40, 0xE0)
 
     time.sleep(0.1)
 
