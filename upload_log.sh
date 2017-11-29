@@ -7,7 +7,7 @@ SAV=$DIR/humidity.logged
 RDY=$DIR/humidity.ready
 UPL=data/humidity_`uname -n`_`date +%Y%m%d_%H%M%S`.log
 
-UPLOAD=/home/pi/Dropbox-Uploader/dropbox_uploader.sh upload 
+UPLOAD="/home/pi/Dropbox-Uploader/dropbox_uploader.sh upload "
 
 if [ -f $TMP ]; then rm -f $TMP; fi
 
