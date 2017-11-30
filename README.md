@@ -52,6 +52,12 @@ the DropBox App token.
 
 > git clone https://github.com/dwinant/humidity_log.git
 
+### Test the logger, I2C and your sensor device
+
+> python humidity_log.py check
+
+You should see output every couple seconds as it reads the sensor.
+
 ### Set the logger to automatically start
 
 To auto-start the logger, add a command similar to this
@@ -64,3 +70,5 @@ to your /etc/rc.local file
 To run the uploader every hour, add this line to /etc/crontab:
 > 0  *    * * *   pi      /home/pi/humidity/upload_log.sh
 
+or for uploads every 6 hours use:
+> 0  1,7,13,19    * * *   pi      /home/pi/humidity/upload_log.sh
