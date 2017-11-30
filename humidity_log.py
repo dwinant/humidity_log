@@ -62,10 +62,14 @@ def log (msg):
         logf.write (msg + "\n")
     print (msg)
     
-log ("Host,Time,Humidity (%),Temperature (C)")
-while True:
-    # Output data to screen
-    h,t = read_humidity_and_temperature()
-    log ("%s, %s,%7.2f,%7.2f" % (host,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+try:
+    log ("Host,Time,Humidity (%),Temperature (C)")
+    while True:
+        # Output data to screen
+        h,t = read_humidity_and_temperature()
+        log ("%s, %s,%7.2f,%7.2f" % (host,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
 
-    time.sleep (_LOG_INTERVAL_SECONDS)
+        time.sleep (_LOG_INTERVAL_SECONDS)
+except KeyboardInterrupt:
+    print "\ndone"
+

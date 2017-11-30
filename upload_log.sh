@@ -22,8 +22,9 @@ fi
 if [ -f $RDY ]; then
   # upload the ready file as a new DropBox file
   $UPLOAD $RDY $UPL
-  if [ $? == 0 ]; then
+  if [ "$?" = "0" ]; then
     rm $RDY
   fi
+  echo Done
 fi
 
