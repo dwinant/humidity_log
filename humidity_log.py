@@ -9,6 +9,7 @@
 
 import smbus
 import socket
+import sys
 import time
 
 LOG_INTERVAL_MINUTES = 5
@@ -61,15 +62,33 @@ def log (msg):
     with open(LOG_FILE, 'a') as logf:
         logf.write (msg + "\n")
     print (msg)
-    
-try:
-    log ("Host,Time,Humidity (%),Temperature (C)")
-    while True:
-        # Output data to screen
-        h,t = read_humidity_and_temperature()
-        log ("%s, %s,%7.2f,%7.2f" % (host,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
 
-        time.sleep (_LOG_INTERVAL_SECONDS)
-except KeyboardInterrupt:
-    print "\ndone"
+def check_loop ():
+    try:
+        print ("Checking sensor on host %s" % (host))
+        while True:
+            # Output data only to screen
+            h,t = read_humidity_and_temperature()
+            print ("%s  HUM = %7.2f %%  TMP = %7.2f C" % (time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print "\ndone"
+
+def log_main ():    
+    try:
+        log ("Host,Time,Humidity (%),Temperature (C)")
+        while True:
+            # Output data to screen and log
+            h,t = read_humidity_and_temperature()
+            log ("%s, %s,%7.2f,%7.2f" % (host,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+
+            time.sleep (_LOG_INTERVAL_SECONDS)
+    except KeyboardInterrupt:
+        print "\ndone"
+
+
+if len(sys.argv) > 1:
+    check_loop()
+else:
+    log_main()
 
