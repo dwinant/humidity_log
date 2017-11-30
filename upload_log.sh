@@ -25,6 +25,5 @@ if [ -f $RDY ]; then
   if [ "$?" = "0" ]; then
     rm $RDY
   fi
-  echo Done
 fi
 
