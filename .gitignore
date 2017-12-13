@@ -2,3 +2,4 @@
 *.logged
 *.ready
 *.tmp
+*.pyc

@@ -52,6 +52,30 @@ the DropBox App token.
 
 > git clone https://github.com/dwinant/humidity_log.git
 
+### Setup the sensor configuration
+
+In this new version, the humidity logger supports multiple sensors.
+The sensors are configured in /home/pi/humidity.cfg.  Each sensor
+is listed on a line. For the sensor attached to the hard I2C bus, all
+you put on the line is the name (or ID) of the sensor.  This name will
+go in the log to mark the sensor data, and it defaults to the hostname
+of the Raspberry Pi.  
+
+If you have additional sensors, they can be connected via GPIO-based I2C.
+For each one, add a line to the config file with the ID of the sensor, 
+and the pin numbers of the data (SDA) and clock (SCL) GPIO signals, 
+separated by commas.
+
+Example:
+(file /home/pi/humidity.cfg)
+sensor1_NW
+sensor2_NW,9,16
+sensor3_SE,22,23
+
+NOTE: If you are using GPIO-based I2C, which uses the pigpio library,
+you need to start the pigpiod daemon. The best way to do this is to add
+the line 'sudo pigpiod' to /etc/rc.local
+
 ### Test the logger, I2C and your sensor device
 
 > python humidity_log.py check

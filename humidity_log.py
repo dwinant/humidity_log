@@ -11,57 +11,51 @@ import smbus
 import socket
 import sys
 import time
+from si_7021 import si_7021_soft, si_7021_hard
 
 LOG_INTERVAL_MINUTES = 5
-I2C_BUS = 1
 LOG_FILE = '/home/pi/humidity/humidity.log'
+CFG_FILE = '/home/pi/humidity.cfg'
 
 # Derived Values
-_LOG_INTERVAL_SECONDS = LOG_INTERVAL_MINUTES * 60
-
-# Get I2C bus
-bus = smbus.SMBus(I2C_BUS)
+#_LOG_INTERVAL_SECONDS = LOG_INTERVAL_MINUTES * 60
+_LOG_INTERVAL_SECONDS = 15
 host = socket.gethostname()
-
-def read_humidity_and_temperature():
-    # SI7021 address, 0x40(64)
-    #		0xF5(245)	Select Relative Humidity NO HOLD master mode
-    bus.write_byte(0x40, 0xF5)
-
-    time.sleep(0.1)
-
-    # SI7021 address, 0x40(64)
-    # Read data back, 2 bytes, Humidity MSB first
-    data0 = bus.read_byte(0x40)
-    data1 = bus.read_byte(0x40)
-
-    # Convert the data
-    humidity = ((data0 * 256 + data1) * 125 / 65536.0) - 6
-
-    time.sleep(0.1)
-
-    # SI7021 address, 0x40(64)
-    #		0xE0(224)	Select temperature (read after humidity)
-    bus.write_byte(0x40, 0xE0)
-
-    time.sleep(0.1)
-
-    # SI7021 address, 0x40(64)
-    # Read data back, 2 bytes, Temperature MSB first
-    data0 = bus.read_byte(0x40)
-    data1 = bus.read_byte(0x40)
-
-    # Convert the data
-    cTemp = ((data0 * 256 + data1) * 175.72 / 65536.0) - 46.85
-    fTemp = cTemp * 1.8 + 32
-
-    return humidity, cTemp
-
+sensors = []
 
 def log (msg):
     with open(LOG_FILE, 'a') as logf:
         logf.write (msg + "\n")
     print (msg)
+
+def soft_reset ():
+    bus.write_byte (I2C_ADDR, 0xFE)
+    print "sent a soft reset"
+
+def hold_master_read ():
+    data0 = bus.read_word_data (I2C_ADDR, 0xE5)
+    data1 = swap16 (data0)
+    humidity = data1 * 125 / 65536.0 - 6
+    print "read humidity %04X %04X = %7.2f %%" % (data0, data1,  humidity)
+
+    data0 = bus.read_word_data (I2C_ADDR, 0xE3)
+    data1 = swap16 (data0)
+    cTemp = (data1 * 175.72 / 65536.0) - 46.85
+    print "read temperature %04x %04x = %7.2f C" % (data0, data1, cTemp)
+    
+
+def get_info ():
+    bus.write_byte (I2C_ADDR, 0xE7)
+    data = bus.read_byte (I2C_ADDR)
+    print "user control byte %02X" % data
+
+    bus.write_byte (I2C_ADDR, 0x11)
+    data = bus.read_byte (I2C_ADDR)
+    print "heater control byte %02X" % data
+ 
+    bus.write_byte_data (I2C_ADDR, 0x84, 0xB8)
+    data = bus.read_byte (I2C_ADDR)
+    print "firmware rev byte %02X" % data
 
 def check_loop ():
     try:
@@ -78,17 +72,51 @@ def log_main ():
     try:
         log ("Host,Time,Humidity (%),Temperature (C)")
         while True:
-            # Output data to screen and log
-            h,t = read_humidity_and_temperature()
-            log ("%s, %s,%7.2f,%7.2f" % (host,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+            for s in sensors:
+                # Output data to screen and log
+                h = s.humidity()
+                t = s.temperature()
+                log ("%s, %s,%7.2f,%7.2f" % (s.id,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
 
             time.sleep (_LOG_INTERVAL_SECONDS)
     except KeyboardInterrupt:
         print "\ndone"
 
+def read_config_line (line):
+    flds = line.rstrip().split(',')
+    if len(flds) == 3:
+        sensors.append (si_7021_soft (flds[0], int(flds[1]), int(flds[2])))
+    elif len(flds) == 1:
+        sensors.append (si_7021_hard (flds[0]))
+    else:
+        raise ValueError ("invalid configuration in file %s" % CFG_FILE)
+    
+def read_config():
+    #try:
+        with open(CFG_FILE, 'r') as f:
+            for line in f:
+                if not line.startswith('#'):
+                    read_config_line (line)
+    #except:
+    #    print ("Could not read config file %s, assuming single sensor named %s" % (CFG_FILE, host))
+    #    sensors.append (si_7021_hard(host))
 
+read_config()
+print ("found %d sensors" % len(sensors))
+for s in sensors:
+    print ("  %s" % (s.id))
+    
 if len(sys.argv) > 1:
-    check_loop()
+    if sys.argv[1] == 'info':
+        get_info()
+    elif sys.argv[1] == 'reset':
+        soft_reset()
+    elif sys.argv[1] == 'check':
+        check_loop()
+    elif sys.argv[1] == 'read':
+        hold_master_read()
+    else:
+        print "unknown argument, try info, read, reset or check"
 else:
     log_main()
 
