@@ -18,8 +18,7 @@ LOG_FILE = '/home/pi/humidity/humidity.log'
 CFG_FILE = '/home/pi/humidity.cfg'
 
 # Derived Values
-#_LOG_INTERVAL_SECONDS = LOG_INTERVAL_MINUTES * 60
-_LOG_INTERVAL_SECONDS = 15
+_LOG_INTERVAL_SECONDS = LOG_INTERVAL_MINUTES * 60
 host = socket.gethostname()
 sensors = []
 
