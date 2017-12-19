@@ -44,26 +44,25 @@ def hold_master_read ():
     
 
 def get_info ():
-    bus.write_byte (I2C_ADDR, 0xE7)
-    data = bus.read_byte (I2C_ADDR)
-    print "user control byte %02X" % data
-
-    bus.write_byte (I2C_ADDR, 0x11)
-    data = bus.read_byte (I2C_ADDR)
-    print "heater control byte %02X" % data
- 
-    bus.write_byte_data (I2C_ADDR, 0x84, 0xB8)
-    data = bus.read_byte (I2C_ADDR)
-    print "firmware rev byte %02X" % data
+    for s in sensors:
+        print ("Info for sensor %s on host %s" % (s.id, host))
+        try:
+            print ("  user control byte   %02X" % s.read_control())
+            print ("  heater control byte %02X" % s.read_heater())
+            print ("  firmware rev        %02X" % s.read_firmware_rev())
+        except:
+            print ("   I2C failed")
 
 def check_loop ():
     try:
-        print ("Checking sensor on host %s" % (host))
         while True:
-            # Output data only to screen
-            h,t = read_humidity_and_temperature()
-            print ("%s  HUM = %7.2f %%  TMP = %7.2f C" % (time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
-            time.sleep(2)
+            for s in sensors:
+                print ("Checking sensor %s on host %s" % (s.id, host))
+                # Output data only to screen
+                h = s.humidity()
+                t = s.temperature()
+                print ("%s  HUM = %7.2f %%  TMP = %7.2f C" % (time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+                time.sleep(2)
     except KeyboardInterrupt:
         print "\ndone"
 
