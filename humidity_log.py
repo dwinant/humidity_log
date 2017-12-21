@@ -58,11 +58,14 @@ def check_loop ():
         while True:
             for s in sensors:
                 print ("Checking sensor %s on host %s" % (s.id, host))
-                # Output data only to screen
-                h = s.humidity()
-                t = s.temperature()
-                print ("%s  HUM = %7.2f %%  TMP = %7.2f C" % (time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
-                time.sleep(2)
+                try:
+                    # Output data only to screen
+                    h = s.humidity()
+                    t = s.temperature()
+                    print ("%s  HUM = %7.2f %%  TMP = %7.2f C" % (time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+                    time.sleep(2)
+                except SystemError:
+                    print ("  I2C error")
     except KeyboardInterrupt:
         print "\ndone"
 
