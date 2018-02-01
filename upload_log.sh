@@ -1,6 +1,6 @@
 #/bin/sh
 
-DIR=/home/pi/humidity
+DIR=/home/pi/humidity_log
 LOG=$DIR/humidity.log
 TMP=$DIR/humidity.tmp
 SAV=$DIR/humidity.logged

@@ -14,7 +14,7 @@ import time
 from si_7021 import si_7021_soft, si_7021_hard
 
 LOG_INTERVAL_MINUTES = 5
-LOG_FILE = '/home/pi/humidity/humidity.log'
+LOG_FILE = '/home/pi/humidity_log/humidity.log'
 CFG_FILE = '/home/pi/humidity.cfg'
 
 # Derived Values
@@ -74,10 +74,13 @@ def log_main ():
         log ("Host,Time,Humidity (%),Temperature (C)")
         while True:
             for s in sensors:
-                # Output data to screen and log
-                h = s.humidity()
-                t = s.temperature()
-                log ("%s, %s,%7.2f,%7.2f" % (s.id,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+                try:
+                    # Output data to screen and log
+                    h = s.humidity()
+                    t = s.temperature()
+                    log ("%s, %s,%7.2f,%7.2f" % (s.id,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
+                except SystemError:
+                    log ("%s, %s  I2C error" % (s.id, time.strftimr("%Y-%m-%d %H:%M:%S")))
 
             time.sleep (_LOG_INTERVAL_SECONDS)
     except KeyboardInterrupt:
