@@ -80,7 +80,7 @@ def log_main ():
                     t = s.temperature()
                     log ("%s, %s,%7.2f,%7.2f" % (s.id,time.strftime("%Y-%m-%d %H:%M:%S"), h, t))
                 except SystemError:
-                    log ("%s, %s  I2C error" % (s.id, time.strftimr("%Y-%m-%d %H:%M:%S")))
+                    log ("%s, %s  I2C error" % (s.id, time.strftime("%Y-%m-%d %H:%M:%S")))
 
             time.sleep (_LOG_INTERVAL_SECONDS)
     except KeyboardInterrupt:
